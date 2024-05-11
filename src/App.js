@@ -17,7 +17,7 @@ function Severity({sev}){
     return <p style={{color:"red"}}>HIGH</p>
   }
   else if(sev === "medium"){
-    return <p style={{color:"yellow"}}>MEDIUM</p>
+    return <p style={{color:"gold"}}>MEDIUM</p>
   }
   else{
     return <p style={{color:"green"}}>LOW</p>
@@ -30,6 +30,7 @@ function App() {
   const [form] = Form.useForm();
   const [notes, setNotes] = useState([]);
   const [rel,setR] = useState("high")
+  const [currentNote, setCurrentNote] = useState(null);
   useEffect(() => {
     fetchNotes();
   }, []);
@@ -53,17 +54,26 @@ function App() {
 
   const handleCancel = () => {
     setModalVisible(false);
+    form.resetFields(); 
+    setCurrentNote(null); 
   };
 
   const onFinish = async (values) => {
     try {
-      await axios.post(`${api}/notes`, values);
+      if (currentNote) {
+        await axios.put(`${api}/notes/${currentNote._id}`, values);
+      } else {
+        await axios.post(`${api}/notes`, values);
+      }
       fetchNotes();
       setModalVisible(false);
+      form.resetFields();
+      setCurrentNote(null);
     } catch (error) {
-      console.error('Error adding note:', error);
+      console.error('Error adding/editing note:', error);
     }
   };
+
 
   const setRele = () =>{
     setR('high')
@@ -80,7 +90,11 @@ function App() {
       console.error('Error deleting note:', error);
     }
   };
-  const handleEdit = () => {}
+  const handleEdit = (note) => {
+    setCurrentNote(note); // Set the current note being edited
+    form.setFieldsValue(note); // Set modal form fields with the current note's values
+    setModalVisible(true);
+  };
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -121,7 +135,7 @@ function App() {
           >
             {collapsed ? <MenuOutlined /> : <></>}
           </Button>
-          <span style={{ color: 'white', margin: 0 }}>NishNotesNOTES ANYWHERE</span>
+          <span style={{ color: 'white', margin: 0,fontSize:"200%" }}>NishNotes</span>
         </Header>
         <Content style={{ margin: '16px' }}>
           <Row gutter={[16, 16]}>
@@ -138,8 +152,9 @@ function App() {
         ]}
       >
         <Severity sev={note.severity}/>
-        <p>{note.description}</p>
-      </Card>
+        
+        <br></br>
+        <pre style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>{note.description}</pre>      </Card>
     </Col>
   ))}
 
@@ -147,14 +162,15 @@ function App() {
         </Content>
       </Layout>
       <Modal
-        title="Add Note"
+        title={currentNote ? "Edit Note" : "Add Note"}
         visible={modalVisible}
         onCancel={handleCancel}
         footer={null}
       >
+        {/* Note form */}
         <Form
           form={form}
-          name="addNoteForm"
+          name="addEditNoteForm"
           onFinish={onFinish}
         >
           <Form.Item
@@ -194,7 +210,7 @@ function App() {
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              Add
+              {currentNote ? "Update" : "Add"}
             </Button>
           </Form.Item>
         </Form>
