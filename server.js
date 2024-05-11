@@ -1,13 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-
+const cors = require("cors")
 const app = express();
 const PORT = process.env.PORT || 3001;
 const uri = "mongodb+srv://nishanth:Soviet1922@cluster0.yxrvdc4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 app.use(bodyParser.json());
-
+app.use(cors())
 // Connect to MongoDB
 mongoose.connect(uri, {
   useNewUrlParser: true,
@@ -40,6 +40,41 @@ app.post('/notes', async (req, res) => {
   }
 });
 
+// Update a note
+app.put('/notes/:id', async (req, res) => {
+  const id = req.params.id;
+  const { title, description, severity, relevance } = req.body;
+  try {
+    const updatedNote = await Note.findByIdAndUpdate(id, { title, description, severity, relevance }, { new: true });
+    if (!updatedNote) {
+      res.status(404).json({ error: 'Note not found' });
+    } else {
+      res.json(updatedNote);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// Delete a note
+app.delete('/notes/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const deletedNote = await Note.findByIdAndDelete(id);
+    if (!deletedNote) {
+      res.status(404).json({ error: 'Note not found' });
+    } else {
+      res.json(deletedNote);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
 app.delete('/notes/:id', async (req, res) => {
   const id = req.params.id;
   try {
@@ -65,5 +100,4 @@ app.get('/notes', async (req, res) => {
   }
 });
 
-// Start the server
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

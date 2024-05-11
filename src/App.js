@@ -1,20 +1,48 @@
-import React, { useState } from 'react';
-import { Layout, Menu, Typography, Button, Modal, Form, Input, Select } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Layout, Menu, Typography, Button, Modal, Form, Input, Select, Card, Row, Col } from 'antd';
 import {
   MenuOutlined,
   CloseOutlined,
-  PlusOutlined
+  PlusOutlined,DeleteOutlined,
+  EditOutlined
 } from '@ant-design/icons';
+import axios from 'axios';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 const { Header, Sider, Content } = Layout;
+const api = "http://localhost:3001"
+function Severity({sev}){
+  if(sev == 'high'){
+    return <p style={{color:"red"}}>HIGH</p>
+  }
+  else if(sev == "medium"){
+    return <p style={{color:"yellow"}}>MEDIUM</p>
+  }
+  else{
+    return <p style={{color:"green"}}>LOW</p>
+  }
+}
 
 function App() {
   const [collapsed, setCollapsed] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [notes, setNotes] = useState([]);
+  const [rel,setR] = useState("high")
+  useEffect(() => {
+    fetchNotes();
+  }, []);
+
+  const fetchNotes = async () => {
+    try {
+      const response = await axios.get(`${api}/notes`);
+      setNotes(response.data);
+    } catch (error) {
+      console.error('Error fetching notes:', error);
+    }
+  };
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
@@ -28,11 +56,32 @@ function App() {
     setModalVisible(false);
   };
 
-  const onFinish = (values) => {
-    console.log('Received values:', values);
-    alert(JSON.stringify(values))
-    setModalVisible(false);
+  const onFinish = async (values) => {
+    try {
+      await axios.post(`${api}/notes`, values);
+      fetchNotes();
+      setModalVisible(false);
+    } catch (error) {
+      console.error('Error adding note:', error);
+    }
   };
+
+  const setRele = () =>{
+    setR('high')
+  }
+  const setNrele = () =>{
+    setR('low')
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${api}/notes/${id}`);
+      fetchNotes();
+    } catch (error) {
+      console.error('Error deleting note:', error);
+    }
+  };
+  const handleEdit = () => {}
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -41,7 +90,8 @@ function App() {
         collapsed={collapsed}
         collapsedWidth={0}
         onCollapse={toggleCollapsed}
-        style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0 }}
+        style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0 ,zIndex:"999"}}
+        align='top'
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '0 16px' }}>
           <div>
@@ -59,8 +109,8 @@ function App() {
         </div>
         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
           <Menu.Item key="1" icon={<PlusOutlined />} onClick={handleAddNote}>Add Note</Menu.Item>
-          <Menu.Item key="2" icon={<MenuOutlined />}>Relevant Notes</Menu.Item>
-          <Menu.Item key="3" icon={<MenuOutlined />}>Not Relevant</Menu.Item>
+          <Menu.Item key="2" icon={<MenuOutlined />} onClick={setRele}>Relevant Notes</Menu.Item>
+          <Menu.Item key="3" icon={<MenuOutlined />} onClick={setNrele} >Not Relevant</Menu.Item>
         </Menu>
       </Sider>
       <Layout className="site-layout">
@@ -72,10 +122,29 @@ function App() {
           >
             {collapsed ? <MenuOutlined /> : <></>}
           </Button>
-          <span style={{color:"white",fontSize:"200%"}}>NishNotes</span>
+          <span style={{ color: 'white', margin: 0 }}>NishNotes</span>
         </Header>
         <Content style={{ margin: '16px' }}>
-          <div style={{ padding: 24, minHeight: 360 }}>{}</div>
+          <Row gutter={[16, 16]}>
+          {notes
+  .filter(note => note.relevance === rel)
+  .map(note => (
+    <Col key={note._id} xs={24} sm={12} md={8} lg={6}>
+      <Card
+        title={note.title}
+        style={{ minHeight: '150px' }}
+        actions={[
+          <DeleteOutlined key="delete" onClick={() => handleDelete(note._id)} />,
+          <EditOutlined key="edit" onClick={() => handleEdit(note)} />,
+        ]}
+      >
+        <Severity sev={note.severity}/>
+        <p>{note.description}</p>
+      </Card>
+    </Col>
+  ))}
+
+          </Row>
         </Content>
       </Layout>
       <Modal
@@ -101,12 +170,12 @@ function App() {
             label="Description"
             rules={[{ required: true, message: 'Please input the description!' }]}
           >
-            <Input.TextArea/>
+            <Input.TextArea />
           </Form.Item>
           <Form.Item
-            name="Relavance"
-            label="Relavance"
-            rules={[{ required: true, message: 'Please input the Relevance!' }]}
+            name="relevance"
+            label="Relevance"
+            rules={[{ required: true, message: 'Please select the relevance!' }]}
           >
             <Select>
               <Option value="low">Low</Option>
