@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Typography, Button, Modal, Form, Input, Select, Card, Row, Col } from 'antd';
+import { Layout, Menu, Button, Modal, Form, Input, Select, Card, Row, Col } from 'antd';
 import {
   MenuOutlined,
   CloseOutlined,
@@ -8,16 +8,15 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 
-const { Title } = Typography;
 const { Option } = Select;
 
 const { Header, Sider, Content } = Layout;
 const api = "https://express-4b9y.onrender.com"
 function Severity({sev}){
-  if(sev == 'high'){
+  if(sev === 'high'){
     return <p style={{color:"red"}}>HIGH</p>
   }
-  else if(sev == "medium"){
+  else if(sev === "medium"){
     return <p style={{color:"yellow"}}>MEDIUM</p>
   }
   else{
