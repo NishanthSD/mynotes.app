@@ -145,7 +145,7 @@ function App() {
     <Col key={note._id} xs={24} sm={12} md={8} lg={6}>
       <Card
         title={note.title}
-        style={{ minHeight: '150px' }}
+        style={{ minHeight: '150px',boxShadow:"0 0 10px lightgray"}}
         actions={[
           <DeleteOutlined key="delete" onClick={() => handleDelete(note._id)} />,
           <EditOutlined key="edit" onClick={() => handleEdit(note)} />,
