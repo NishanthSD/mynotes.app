@@ -127,7 +127,7 @@ function App() {
         </Menu>
       </Sider>
       <Layout className="site-layout">
-        <Header className="site-layout-background" style={{ padding: 0, backgroundColor: "green", boxShadow: "0px 0px 10px green" }}>
+        <Header className="site-layout-background" style={{ padding: 0, backgroundColor: "green", boxShadow: "0px 0px 10px green",position:"fixed",zIndex:"99",width:"100vw" }}>
           <Button
             type="text"
             onClick={toggleCollapsed}
@@ -137,10 +137,46 @@ function App() {
           </Button>
           <span style={{ color: 'white', margin: 0,fontSize:"200%" }}>NishNotes</span>
         </Header>
-        <Content style={{ margin: '16px' }}>
+        <Content style={{ margin: '16px',marginTop:"80px" }}>
           <Row gutter={[16, 16]}>
           {notes
-  .filter(note => note.relevance === rel)
+  .filter(note => { return note.relevance === rel && note.severity === 'high'})
+  .map(note => (
+    <Col key={note._id} xs={24} sm={12} md={8} lg={6}>
+      <Card
+        title={note.title}
+        style={{ minHeight: '150px',boxShadow:"0 0 10px lightgray"}}
+        actions={[
+          <DeleteOutlined key="delete" onClick={() => handleDelete(note._id)} />,
+          <EditOutlined key="edit" onClick={() => handleEdit(note)} />,
+        ]}
+      >
+        <Severity sev={note.severity}/>
+        
+        <br></br>
+        <pre style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>{note.description}</pre>      </Card>
+    </Col>
+  ))}
+      {notes
+  .filter(note => { return note.relevance === rel && note.severity === 'medium'})
+  .map(note => (
+    <Col key={note._id} xs={24} sm={12} md={8} lg={6}>
+      <Card
+        title={note.title}
+        style={{ minHeight: '150px',boxShadow:"0 0 10px lightgray"}}
+        actions={[
+          <DeleteOutlined key="delete" onClick={() => handleDelete(note._id)} />,
+          <EditOutlined key="edit" onClick={() => handleEdit(note)} />,
+        ]}
+      >
+        <Severity sev={note.severity}/>
+        
+        <br></br>
+        <pre style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>{note.description}</pre>      </Card>
+    </Col>
+  ))}
+        {notes
+  .filter(note => { return note.relevance === rel && note.severity === 'low'})
   .map(note => (
     <Col key={note._id} xs={24} sm={12} md={8} lg={6}>
       <Card
