@@ -12,7 +12,7 @@ const { Title } = Typography;
 const { Option } = Select;
 
 const { Header, Sider, Content } = Layout;
-const api = "http://65.0.210.65:80"
+const api = "http://localhost:3001"
 function Severity({sev}){
   if(sev == 'high'){
     return <p style={{color:"red"}}>HIGH</p>
