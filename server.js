@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require("cors")
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 80;
 const uri = "mongodb+srv://nishanth:Soviet1922@cluster0.yxrvdc4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 app.use(bodyParser.json());
