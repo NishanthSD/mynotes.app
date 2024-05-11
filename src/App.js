@@ -122,7 +122,7 @@ function App() {
           >
             {collapsed ? <MenuOutlined /> : <></>}
           </Button>
-          <span style={{ color: 'white', margin: 0 }}>NishNotes</span>
+          <span style={{ color: 'white', margin: 0 }}>NishNotesNOTES ANYWHERE</span>
         </Header>
         <Content style={{ margin: '16px' }}>
           <Row gutter={[16, 16]}>
