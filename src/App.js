@@ -7,6 +7,8 @@ import {
   EditOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
+import { DownOutlined} from '@ant-design/icons';
+import { Dropdown, Space } from 'antd';
 
 const { Option } = Select;
 
@@ -25,12 +27,46 @@ function Severity({sev}){
 }
 
 function App() {
+
   const [collapsed, setCollapsed] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [notes, setNotes] = useState([]);
   const [rel,setR] = useState("high")
   const [currentNote, setCurrentNote] = useState(null);
+  const [srt,serSrt] = useState('all');
+  const items= [
+    {
+      key: '1',
+      label: (
+        <p onClick={() => serSrt("high")}>
+          High
+        </p>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <p onClick={() => serSrt("medium")}>
+          Medium
+        </p>
+      )
+    },
+    {
+      key: '3',
+      label: (
+        <p onClick={() => serSrt("low")}>
+          low
+        </p>
+      ),
+    },
+    {
+      key: '4',
+      label: <p  onClick={() => serSrt("all")}>
+      All
+    </p>
+    },
+  ];
   useEffect(() => {
     fetchNotes();
   }, []);
@@ -138,9 +174,17 @@ function App() {
           <span style={{ color: 'white', margin: 0,fontSize:"200%" }}>NishNotes</span>
         </Header>
         <Content style={{ margin: '16px',marginTop:"80px" }}>
+        <Row style={{margin:"10px"}} gutter={[16, 16]}>
+        <Dropdown  menu={{ items }}>
+          <Space>
+            {srt}
+            <DownOutlined />
+          </Space>
+        </Dropdown>
+        </Row>
           <Row gutter={[16, 16]}>
           {notes
-  .filter(note => { return note.relevance === rel && note.severity === 'high'})
+  .filter(note => { return note.relevance === rel && (note.severity === 'high' && (srt === 'all' || srt === 'high'))})
   .map(note => (
     <Col key={note._id} xs={24} sm={12} md={8} lg={6}>
       <Card
@@ -158,7 +202,7 @@ function App() {
     </Col>
   ))}
       {notes
-  .filter(note => { return note.relevance === rel && note.severity === 'medium'})
+  .filter(note => { return note.relevance === rel && (note.severity === 'medium' && (srt === 'all' || srt === 'medium'))})
   .map(note => (
     <Col key={note._id} xs={24} sm={12} md={8} lg={6}>
       <Card
@@ -176,7 +220,7 @@ function App() {
     </Col>
   ))}
         {notes
-  .filter(note => { return note.relevance === rel && note.severity === 'low'})
+  .filter(note => { return note.relevance === rel && (note.severity === 'low' && (srt === 'all' || srt === 'low'))})
   .map(note => (
     <Col key={note._id} xs={24} sm={12} md={8} lg={6}>
       <Card
@@ -276,3 +320,4 @@ function App() {
 }
 
 export default App;
+
